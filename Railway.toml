@@ -3,8 +3,11 @@
 [build]
 builder = "nixpacks"
 
-[variables]
+[build.env]
 NIXPACKS_NODE_VERSION = "22"
+
+[variables]
+NODE_ENV = "production"
 
 [deploy]
 numReplicas = 1
