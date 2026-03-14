@@ -8,6 +8,7 @@
     "install:all": "npm run install:backend && npm run install:frontend",
     "start:backend": "cd backend && npm start",
     "build:frontend": "cd frontend && npm run build",
+    "start:frontend": "cd frontend && npm start",
     "dev:backend": "cd backend && npm run dev",
     "dev:frontend": "cd frontend && npm run dev"
   }
