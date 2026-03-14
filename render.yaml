@@ -33,9 +33,8 @@ services:
           property: port
 
   # Frontend Service
-  - type: web
+  - type: static
     name: mood-tracker-frontend
-    runtime: static
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: frontend/dist
     envVars:
