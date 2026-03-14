@@ -2,7 +2,7 @@ services:
   # Backend Service
   - type: web
     name: mood-tracker-api
-    env: node
+    runtime: node
     plan: free
     buildCommand: npm run install:backend
     startCommand: npm run start:backend
@@ -35,7 +35,7 @@ services:
   # Frontend Service
   - type: web
     name: mood-tracker-frontend
-    env: static
+    runtime: static
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: frontend/dist
     envVars:
