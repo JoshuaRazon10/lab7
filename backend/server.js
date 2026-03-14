@@ -7,7 +7,9 @@ require("dotenv").config(); // Load .env variables (Part 3 – no hardcoded cred
 const express = require("express");
 const cors = require("cors");
 const mysql = require("mysql2/promise");
+const { Pool: PgPool } = require("pg"); // Extra Credit - PostgreSQL support for Render
 const morgan = require("morgan");             // Extra Credit – request logging
+
 const rateLimit = require("express-rate-limit"); // Extra Credit – rate limiting
 
 const app = express();
@@ -34,16 +36,42 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // ── Database Connection ─────────────────────────────────────
-// Credentials come from .env file (Part 3 – Environment Variables)
-const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,   // Uses process.env, NOT hardcoded
-  database: process.env.DB_NAME,
-  port: process.env.DB_PORT || 3306,
-  waitForConnections: true,
-  connectionLimit: 10
-});
+// Support for both MySQL and PostgreSQL
+let db;
+const usePostgres = process.env.DB_TYPE === "postgres" || process.env.DB_PORT === "5432" || process.env.DATABASE_URL;
+
+if (usePostgres) {
+  console.log("Using PostgreSQL connection");
+  const pgPool = new PgPool({
+    connectionString: process.env.DATABASE_URL || `postgresql://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT || 5432}/${process.env.DB_NAME}`,
+    ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false
+  });
+
+  db = {
+    query: async (text, params) => {
+      // Map ? to $1, $2, etc. for PostgreSQL portability
+      let index = 0;
+      const pgText = text.replace(/\?/g, () => `$${++index}`);
+      const result = await pgPool.query(pgText, params);
+      return [result.rows, result];
+    }
+  };
+} else {
+  console.log("Using MySQL connection");
+  const mysqlPool = mysql.createPool({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: process.env.DB_PORT || 3306,
+    waitForConnections: true,
+    connectionLimit: 10
+  });
+
+  db = {
+    query: (text, params) => mysqlPool.query(text, params)
+  };
+}
 
 // ── Part 0.2 – POST /mood  (with logging) ───────────────────
 app.post("/mood", async (req, res) => {
@@ -58,12 +86,14 @@ app.post("/mood", async (req, res) => {
   }
 
   try {
-    const [result] = await pool.query(
-      "INSERT INTO mood_log (mood) VALUES (?)",      // Parameterized query (Part 3 – SQL Injection safe)
+    const [result] = await db.query(
+      "INSERT INTO mood_log (mood) VALUES (?)",      // Portability: db.query handles ? to $1 for PG
       [mood]
     );
+    // Adjust result handling as MySQL and PG return different result structures
+    const insertId = result.insertId || (result[0] && result[0].id) || null;
     console.log("Database insert result:", result);  // Log DB result
-    res.json({ message: "Mood saved successfully", id: result.insertId });
+    res.json({ message: "Mood saved successfully", id: insertId });
   } catch (err) {
     console.error("Database error:", err.message);   // Log DB errors
     res.status(500).json({ error: "Database error", details: err.message });
@@ -75,7 +105,7 @@ app.get("/moods", async (req, res) => {
   console.log("GET /moods request received");
 
   try {
-    const [rows] = await pool.query(
+    const [rows] = await db.query(
       "SELECT * FROM mood_log ORDER BY created_at DESC"
     );
     console.log("Moods fetched:", rows.length, "records");
