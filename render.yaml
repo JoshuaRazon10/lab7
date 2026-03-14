@@ -40,7 +40,7 @@ services:
     staticPublishPath: frontend/dist
     envVars:
       - key: VITE_API_URL
-        value: https://mood-tracker-api.onrender.com # Update this manually after the API is deployed
+        value: https://mood-tracker-api-production.up.railway.app # Update this manually after the API is deployed
 
 databases:
   - name: mood-db
