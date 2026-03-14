@@ -1,8 +1,5 @@
 -- SE2 Lab 7: Mood Tracker Database Setup
--- Run this script to create the database and table
-
-CREATE DATABASE IF NOT EXISTS mood_tracker;
-USE mood_tracker;
+-- Run this script to create the table in your database
 
 CREATE TABLE IF NOT EXISTS mood_log (
   id INT AUTO_INCREMENT PRIMARY KEY,

@@ -41,10 +41,7 @@ services:
     staticPublishPath: frontend/dist
     envVars:
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: mood-tracker-api
-          property: url
+        value: https://mood-tracker-api.onrender.com # Update this manually after the API is deployed
 
 databases:
   - name: mood-db
