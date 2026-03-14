@@ -9,3 +9,9 @@ sleepApplication = false
 
 # Individual service configurations can be managed in the Railway Dashboard
 # by setting the "Root Directory" to either 'backend' or 'frontend'.
+
+[services.frontend]
+startCommand = "cd frontend && npm start"
+
+[services.backend]
+startCommand = "cd backend && npm start"
