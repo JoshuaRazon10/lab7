@@ -1,0 +1,11 @@
+# Railway Monorepo Configuration
+
+[build]
+builder = "nixpacks"
+
+[deploy]
+numReplicas = 1
+sleepApplication = false
+
+# Individual service configurations can be managed in the Railway Dashboard
+# by setting the "Root Directory" to either 'backend' or 'frontend'.
