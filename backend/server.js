@@ -87,7 +87,7 @@ app.post("/mood", async (req, res) => {
 
   try {
     const [result] = await db.query(
-      "INSERT INTO mood_logs (mood) VALUES (?)",      // 🔴 BUG #3: Incorrect Table Name
+      "INSERT INTO mood_log (mood) VALUES (?)",      // Portability: db.query handles ? to $1 for PG
       [mood]
     );
     // Adjust result handling as MySQL and PG return different result structures
