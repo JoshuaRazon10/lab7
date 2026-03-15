@@ -43,7 +43,7 @@ const usePostgres = process.env.DB_TYPE === "postgres" || process.env.DB_PORT ==
 if (usePostgres) {
   console.log("Using PostgreSQL connection");
   const pgPool = new PgPool({
-    connectionString: process.env.DATABASE_URL.replace(/[:][^@]*[@]/, ":wrongpassword@") || `postgresql://${process.env.DB_USER}:wrongpassword@${process.env.DB_HOST}:${process.env.DB_PORT || 5432}/${process.env.DB_NAME}`,
+    connectionString: process.env.DATABASE_URL || `postgresql://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT || 5432}/${process.env.DB_NAME}`,
     ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false
   });
 
@@ -87,7 +87,7 @@ app.post("/mood", async (req, res) => {
 
   try {
     const [result] = await db.query(
-      "INSERT INTO mood_log (mood) VALUES (?)",      // Portability: db.query handles ? to $1 for PG
+      "INSERT INTO mood_logs (mood) VALUES (?)",      // 🔴 BUG #3: Incorrect Table Name
       [mood]
     );
     // Adjust result handling as MySQL and PG return different result structures
