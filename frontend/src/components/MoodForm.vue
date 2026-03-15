@@ -35,8 +35,10 @@ export default {
       this.message = '';
       this.error = '';
 
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/mood`, {
+        const apiUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/mood`;
+        console.log("Fetching from URL:", apiUrl);
+
+        const response = await fetch(apiUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ mood: this.mood })
