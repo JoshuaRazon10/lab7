@@ -35,6 +35,7 @@ export default {
       this.message = '';
       this.error = '';
 
+      try {
         const apiUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/mood`;
         console.log("Fetching from URL:", apiUrl);
 
@@ -44,19 +45,30 @@ export default {
           body: JSON.stringify({ mood: this.mood })
         });
 
-        console.log("API response status:", response.status); // Log the server response status
+        console.log("API response status:", response.status);
 
-        const data = await response.json();
+        // Robust JSON parsing to avoid "Unexpected end of JSON input"
+        const text = await response.text();
+        console.log("API response text:", text);
+        
+        let data = {};
+        if (text) {
+          try {
+            data = JSON.parse(text);
+          } catch (e) {
+            console.error("JSON parse error:", e);
+          }
+        }
 
         if (response.ok) {
-          this.message = data.message;
-          this.mood = '';  // Clear input after success
+          this.message = data.message || "Mood saved!";
+          this.mood = '';
         } else {
           this.error = data.error || "Something went wrong";
         }
       } catch (err) {
         console.error("Fetch error:", err);
-        this.error = "Could not connect to the API. Is the server running?";
+        this.error = "Could not connect to the API. Check console for details.";
       }
     }
   }
