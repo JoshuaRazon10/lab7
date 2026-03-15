@@ -33,10 +33,32 @@ export default {
       this.loading = true;
 
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/moods`);
+        let baseApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+        
+        // Ensure protocol exists to avoid relative path errors
+        if (baseApiUrl && !baseApiUrl.startsWith('http')) {
+          baseApiUrl = `https://${baseApiUrl}`;
+        }
+
+        const apiUrl = `${baseApiUrl}/moods`;
+        console.log("Fetching mood history from:", apiUrl);
+
+        const response = await fetch(apiUrl);
         console.log("Mood history response status:", response.status);
 
-        const data = await response.json();
+        // Robust JSON parsing to avoid "Unexpected end of JSON input"
+        const text = await response.text();
+        console.log("Mood history response text:", text);
+        
+        let data = [];
+        if (text) {
+          try {
+            data = JSON.parse(text);
+          } catch (e) {
+            console.error("JSON parse error for history:", e);
+          }
+        }
+        
         console.log("Mood history data:", data);
         this.moods = data;
       } catch (err) {

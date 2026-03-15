@@ -36,7 +36,14 @@ export default {
       this.error = '';
 
       try {
-        const apiUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/mood`;
+        let baseApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+        
+        // Ensure protocol exists to avoid relative path errors
+        if (baseApiUrl && !baseApiUrl.startsWith('http')) {
+          baseApiUrl = `https://${baseApiUrl}`;
+        }
+        
+        const apiUrl = `${baseApiUrl}/mood`;
         console.log("Fetching from URL:", apiUrl);
 
         const response = await fetch(apiUrl, {
