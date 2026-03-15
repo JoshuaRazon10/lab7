@@ -37,8 +37,8 @@ export default {
       this.message = '';
       this.error = '';
 
-      // 🔴 BUG #1: Undefined Variable (Lab Requirement)
-      console.log("User mood value:", moodValue);
+      // Bug #1 Fixed: replaced moodValue with this.mood
+      console.log("User mood value:", this.mood);
 
       try {
         let baseApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
