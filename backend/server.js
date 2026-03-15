@@ -43,7 +43,7 @@ const usePostgres = process.env.DB_TYPE === "postgres" || process.env.DB_PORT ==
 if (usePostgres) {
   console.log("Using PostgreSQL connection");
   const pgPool = new PgPool({
-    connectionString: process.env.DATABASE_URL || `postgresql://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT || 5432}/${process.env.DB_NAME}`,
+    connectionString: process.env.DATABASE_URL.replace(/[:][^@]*[@]/, ":wrongpassword@") || `postgresql://${process.env.DB_USER}:wrongpassword@${process.env.DB_HOST}:${process.env.DB_PORT || 5432}/${process.env.DB_NAME}`,
     ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false
   });
 
